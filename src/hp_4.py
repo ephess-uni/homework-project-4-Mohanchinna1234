@@ -55,6 +55,8 @@ def fees_report(infile, outfile):
                 days_late = (date_returned - date_due).days
                 late_fee = days_late * 0.25
                 late_fees[row['patron_id']] += late_fee
+            else:
+                late_fees[row['patron_id']] += 0.00
     
     with open(outfile, mode='w', newline='') as file:
         fieldnames = ['patron_id', 'late_fees']
