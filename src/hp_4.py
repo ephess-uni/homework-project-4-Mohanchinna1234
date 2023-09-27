@@ -32,8 +32,8 @@ def add_date_range(values, start_date):
     """Adds a daily date range to the list `values` beginning with
     `start_date`.  The date, value pairs are returned as tuples
     in the returned list."""
-    date_range = date_range(start_date, len(values))
-    result = list(zip(date_range, values))
+    date_range_list = date_range(start_date, len(values))
+    result = list(zip(date_range_list, values))
     return result
 
 
