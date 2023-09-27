@@ -45,18 +45,19 @@ def fees_report(infile, outfile):
     with open(infile, mode='r', newline='') as file:
         reader = csv.DictReader(file)
         for row in reader:
+            date_returned = datetime.strptime(row['date_returned'], '%m/%d/%Y')
             date_due = datetime.strptime(row['date_due'], '%m/%d/%Y')
-            date_returned = datetime.strptime(row['date_returned'], '%m/%d/%y')
-            days_late = (date_returned - date_due).days
-            late_fee = max(0, days_late) * 0.25
-            patron_id = row['patron_id']
-            late_fees[patron_id] += late_fee
-    with open(outfile, mode='w', newline='') as file:
-        fieldnames = ['patron_id', 'late_fees']
-        writer = csv.DictWriter(file, fieldnames=fieldnames)
-        writer.writeheader()
+            
+            if date_returned > date_due:
+                days_late = (date_returned - date_due).days
+                late_fee = days_late * 0.25
+                late_fees[row['patron_id']] += late_fee
+
+    with open(outfile, mode='w', newline='') as out_file:
+        writer = csv.writer(out_file)
+        writer.writerow(['patron_id', 'late_fees'])
         for patron_id, fee in late_fees.items():
-            writer.writerow({'patron_id': patron_id, 'late_fees': fee})
+            writer.writerow([patron_id, '{:.2f}'.format(fee)])
 
 
 # The following main selection block will only run when you choose
