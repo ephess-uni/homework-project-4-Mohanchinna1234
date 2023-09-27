@@ -42,22 +42,27 @@ def fees_report(infile, outfile):
     """Calculates late fees per patron id and writes a summary report to
     outfile."""
     late_fees = defaultdict(float)
+    
     with open(infile, mode='r', newline='') as file:
         reader = csv.DictReader(file)
+        
         for row in reader:
-            date_returned = datetime.strptime(row['date_returned'], '%m/%d/%Y')
+            date_checkout = datetime.strptime(row['date_checkout'], '%m/%d/%Y')
             date_due = datetime.strptime(row['date_due'], '%m/%d/%Y')
+            date_returned = datetime.strptime(row['date_returned'], '%m/%d/%y')
             
             if date_returned > date_due:
                 days_late = (date_returned - date_due).days
                 late_fee = days_late * 0.25
                 late_fees[row['patron_id']] += late_fee
-
-    with open(outfile, mode='w', newline='') as out_file:
-        writer = csv.writer(out_file)
-        writer.writerow(['patron_id', 'late_fees'])
-        for patron_id, fee in late_fees.items():
-            writer.writerow([patron_id, '{:.2f}'.format(fee)])
+    
+    with open(outfile, mode='w', newline='') as file:
+        fieldnames = ['patron_id', 'late_fees']
+        writer = csv.DictWriter(file, fieldnames=fieldnames)
+        writer.writeheader()
+        
+        for patron_id, late_fee in late_fees.items():
+            writer.writerow({'patron_id': patron_id, 'late_fees': '{:.2f}'.format(late_fee)})
 
 
 # The following main selection block will only run when you choose
